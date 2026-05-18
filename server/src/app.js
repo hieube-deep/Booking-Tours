@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import router from "./routes";
 // import cors from "cors";
 // import dotenv from "dotenv";
 
@@ -15,6 +16,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("API is running...");
 });
+
+app.use('/api', router)
 
 // Database connection
 const PORT = process.env.PORT || 5000;
