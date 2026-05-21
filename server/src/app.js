@@ -1,15 +1,15 @@
 import express from "express";
 import mongoose from "mongoose";
-import router from "./routes";
-// import cors from "cors";
-// import dotenv from "dotenv";
+import router from "./routes/index.js";
+import cors from "cors";
+import dotenv from "dotenv";
 
-// dotenv.config();
+dotenv.config();
 
 const app = express();
 
 // Middlewares
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 
 // Routes
