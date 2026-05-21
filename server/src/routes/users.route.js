@@ -6,6 +6,9 @@ const UserRouter = express.Router();
 
 UserRouter.post('/register', Register);
 UserRouter.post('/login', Login);
-UserRouter.put('/change-password', protect, changePassword);
+
+UserRouter.use(protect);
+
+UserRouter.put('/change-password', changePassword);
 
 export default UserRouter;

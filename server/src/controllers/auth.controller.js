@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/users.model.js";
 import bcrypt from "bcrypt";
-const gerenateToken = (id) => jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: process.env.JWT_EXPIRE || '7d' });
+const generateToken = (id) => jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: process.env.JWT_EXPIRE || '7d' });
 
 
 export const Register = async (req, res) => {
@@ -20,7 +20,7 @@ export const Register = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: "đăng ký thành công",
-            token: gerenateToken(user._id),
+            token: generateToken(user._id),
             user: {
                 _id: user._id,
                 name: user.name,
@@ -51,7 +51,7 @@ export const Login = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ message: "mật khẩu không đúng" });
         }
-        const token = gerenateToken(user._id);
+        const token = generateToken(user._id);
         return res.status(200).json({
             success: true,
             message: "đăng nhập thành công",
@@ -73,7 +73,12 @@ export const Login = async (req, res) => {
 export const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        const user = await User.findById(req.user.id).select("password");
+        
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: "Vui lòng truyền đủ currentPassword và newPassword" });
+        }
+
+        const user = await User.findById(req.user._id).select("password");
         if (!user) {
             return res.status(404).json({ message: "không tìm thấy tài khoản" })
         }
@@ -88,7 +93,7 @@ export const changePassword = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "đổi mật khẩu thành công",
-            token: gerenateToken(user._id),
+            token: generateToken(user._id),
         })
 
     } catch (error) {
