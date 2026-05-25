@@ -73,7 +73,7 @@ export const Login = async (req, res) => {
 export const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        
+
         if (!currentPassword || !newPassword) {
             return res.status(400).json({ message: "Vui lòng truyền đủ currentPassword và newPassword" });
         }
@@ -84,7 +84,7 @@ export const changePassword = async (req, res) => {
         }
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "sai mật khẩu" });
+            return res.status(400).json({ message: "sai mật khẩu hiện tại" });
         }
 
         const salt = await bcrypt.hash(newPassword, 10);
