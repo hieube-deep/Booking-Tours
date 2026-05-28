@@ -19,7 +19,8 @@
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.76.1",
     "react-router-dom": "^7.15.1",
-    "react-toastify": "^11.1.0"
+    "react-toastify": "^11.1.0",
+    "sweetalert2": "^11.26.25"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

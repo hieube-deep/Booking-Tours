@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/utils/constants';
 import Button from '@/components/ui/Button';
+import Swal from 'sweetalert2';
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -13,6 +14,22 @@ export default function Header() {
     logout();
     navigate(ROUTES.HOME);
   };
+  const handleConfirmLogout = async () => {
+    const result = Swal.fire({
+      title: "bạn có chắc muốn đăng xuất không",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Đăng xuất",
+      cancelButtonText: "Hủy"
+    })
+    if ((await result).isConfirmed) {
+      handleLogout();
+
+    }
+  }
+
 
   const navLinks = [
     { label: 'Trang chủ', path: ROUTES.HOME },
@@ -69,7 +86,7 @@ export default function Header() {
                   </div>
                   <span className="text-sm font-medium text-slate-700">{user?.name}</span>
                 </Link>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                <Button variant="ghost" size="sm" onClick={handleConfirmLogout} className='hover:text-red-500' >
                   Đăng xuất
                 </Button>
               </div>
@@ -124,7 +141,7 @@ export default function Header() {
                     >
                       Tài khoản
                     </Link>
-                    <button onClick={handleLogout} className="py-2 text-red-500 font-medium text-left cursor-pointer">
+                    <button onClick={handleConfirmLogout} className="py-2 text-red-500 font-medium text-left cursor-pointer">
                       Đăng xuất
                     </button>
                   </>
