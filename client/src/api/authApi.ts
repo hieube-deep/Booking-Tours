@@ -10,6 +10,10 @@ export const authApi = {
     return axiosClient.post('/auth/register', data);
   },
 
+  googleLogin: (token: string): Promise<AuthResponse> => {
+    return axiosClient.post('/auth/google-login', { token });
+  },
+
   changePassword: (data: ChangePasswordRequest) => {
     return axiosClient.put('/auth/change-password', data);
   },

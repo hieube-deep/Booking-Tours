@@ -10,6 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
+  loginWithGoogle: (token: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -47,6 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(response.user);
   }, []);
 
+  const loginWithGoogle = useCallback(async (googleToken: string) => {
+    const response = await authApi.googleLogin(googleToken);
+    storage.setToken(response.token);
+    storage.setUser(response.user);
+    setToken(response.token);
+    setUser(response.user);
+  }, []);
+
   const logout = useCallback(() => {
     storage.clear();
     setToken(null);
@@ -60,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     register,
+    loginWithGoogle,
     logout,
   };
 

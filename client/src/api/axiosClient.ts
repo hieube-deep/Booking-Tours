@@ -29,8 +29,8 @@ axiosClient.interceptors.response.use(
     if (error.response) {
       const { status } = error.response;
 
-      // Token hết hạn hoặc không hợp lệ
-      if (status === 401) {
+      // Token hết hạn hoặc không hợp lệ (không tự động redirect khi đang cố gắng đăng nhập/đăng ký)
+      if (status === 401 && !error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/register')) {
         storage.clear();
         window.location.href = '/login';
       }

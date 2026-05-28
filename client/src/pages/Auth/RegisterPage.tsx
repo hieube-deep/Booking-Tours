@@ -7,13 +7,14 @@ import type { RegisterRequest } from '@/types/user';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { toast } from 'react-toastify';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 interface RegisterFormData extends RegisterRequest {
   confirmPassword: string;
 }
 
 export default function RegisterPage() {
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,6 +38,24 @@ export default function RegisterPage() {
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       toast.error(err.response?.data?.message || 'Đăng ký thất bại');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setIsSubmitting(true);
+      if (credentialResponse.credential) {
+        await loginWithGoogle(credentialResponse.credential);
+        toast.success('Đăng ký thành công bằng Google!');
+        navigate(ROUTES.HOME, { replace: true });
+      } else {
+        toast.error('Không nhận được thông tin xác thực từ Google');
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Đăng ký Google thất bại');
     } finally {
       setIsSubmitting(false);
     }
@@ -106,6 +125,26 @@ export default function RegisterPage() {
               value === password || 'Mật khẩu xác nhận không khớp',
           })}
         />
+        <div className="relative my-6">
+          <div className='absolute inset-0 flex items-center'>
+            <div className='w-full border border-slate-200'></div>
+          </div>
+          <div>
+            <div className='relative flex justify-center text-sm'>
+              <span className='px-2 bg-white text-slate-500'>Hoặc đăng ký bằng Google</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <GoogleOAuthProvider clientId="446988791872-2uplk1l2qed92h4402qb5j5runuhlhbn.apps.googleusercontent.com">
+            <GoogleLogin
+              onSuccess={onGoogleSuccess}
+              onError={() => {
+                toast.error('Đăng ký bằng Google thất bại');
+              }}
+            />
+          </GoogleOAuthProvider>
+        </div>
 
         <Button type="submit" isLoading={isSubmitting} className="w-full">
           Đăng ký

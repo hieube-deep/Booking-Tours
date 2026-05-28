@@ -24,7 +24,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to={ROUTES.TOURS}>
-                <Button size="lg" className="border-white/30 text-white hover:bg-white/10 shadow-xl ">
+                <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 ">
                   Xem tất cả Tour
                 </Button>
               </Link>
