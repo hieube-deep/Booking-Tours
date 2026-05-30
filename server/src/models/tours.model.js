@@ -40,7 +40,17 @@ const tourSchema = new Schema({
     isActive: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },
     tags: [{ type: String }]
-}, { timestamps: true });
+}, { 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+tourSchema.virtual('review', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'serviceId'
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 export default Tour;

@@ -2,21 +2,24 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const departureSchema = new Schema({
-    tourId,               // ref Tour
-    departureDate,        // ngày khởi hành
-    returnDate,           // ngày về
-    status,               // "open" | "confirmed" | "full" | "cancelled"
-    maxSlots,             // tổng chỗ
-    bookedSlots,          // đã đặt
-    availableSlots,       // tính = maxSlots - bookedSlots
-    priceOverride: {      // ghi đè giá nếu có khuyến mãi
-        adult, child
+    tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
+    departureDate: { type: Date, required: true },
+    returnDate: { type: Date, required: true },
+    status: { type: String, enum: ['open', 'confirmed', 'full', 'cancelled'], default: 'open' },
+    maxSlots: { type: Number, required: true },
+    bookedSlots: { type: Number, default: 0 },
+    availableSlots: { type: Number },
+    priceOverride: {
+        adult: { type: Number },
+        child: { type: Number }
     },
-    guide: {              // hướng dẫn viên phụ trách
-        name, phone, avatar
+    guide: {
+        name: { type: String },
+        phone: { type: String },
+        avatar: { type: String }
     },
-    vehicle,              // "xe 45 chỗ" | "máy bay VN123"
-    notes,
+    vehicle: { type: String },
+    notes: { type: String },
 }, { timestamps: true });
 
 const Departure = mongoose.model('Departure', departureSchema);

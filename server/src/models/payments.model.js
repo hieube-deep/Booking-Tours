@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose
 const paymentSchema = new Schema({
-    bookingId: { type: ObjectId, ref: 'Booking', required: true, unique: true },
+    bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: true, unique: true },
     method: { type: String, enum: ['stripe', 'vnpay', 'cash'] },
     status: { type: String, enum: ['pending', 'success', 'failed', 'refunded'], default: 'pending' },
     amount: { type: Number, required: true },

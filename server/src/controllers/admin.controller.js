@@ -1,7 +1,8 @@
-import Booking from "../models/bookings.model";
-import Payment from "../models/payments.model";
-import User from "../models/users.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import Booking from "../models/bookings.model.js";
+import Payment from "../models/payments.model.js";
+import User from "../models/users.model.js";
+import Tour from "../models/tours.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const getDashboard = asyncHandler(async (req, res) => {
     const now = new Date();
@@ -12,14 +13,16 @@ export const getDashboard = asyncHandler(async (req, res) => {
     const [
         totalUsers,
         totalBookings,
-        monthBookings,
-        lastMonthBookings,
-        revenueData,
-        bookingsByStatus,
-        topTours, ,
+        activeTours,
+        monthStats,
+        lastMonthStats,
+        bookingsByStatus
     ] = await Promise.all([
         User.countDocuments({ role: "user" }),
         Booking.countDocuments(),
+        Tour.countDocuments({ isActive: true }),
+
+        // Thống kê doanh thu & tổng số lượng booking tháng này
         Booking.aggregate([
             { $match: { status: "success", createdAt: { $gte: startOfMonth } } },
             {
@@ -31,10 +34,42 @@ export const getDashboard = asyncHandler(async (req, res) => {
             }
         ]),
 
+        // Thống kê doanh thu & tổng số lượng booking tháng trước
         Booking.aggregate([
-            { $group: { _id: '$status', count: { $sum: 1 } } },
+            {
+                $match: {
+                    status: "success",
+                    createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    monthTotal: { $sum: 1 },
+                    monthRevenue: { $sum: "$priceBreakdown.total" }
+                }
+            }
+        ]),
+
+        // Phân loại số lượng booking theo trạng thái
+        Booking.aggregate([
+            { $group: { _id: '$status', count: { $sum: 1 } } }
         ])
-    ])
+    ]);
+
+    return res.status(200).json({
+        success: true,
+        data: {
+            totalUsers,
+            totalBookings,
+            activeTours,
+            monthRevenue: monthStats[0]?.monthRevenue || 0,
+            monthBookings: monthStats[0]?.monthTotal || 0,
+            lastMonthRevenue: lastMonthStats[0]?.monthRevenue || 0,
+            lastMonthBookings: lastMonthStats[0]?.monthTotal || 0,
+            bookingsByStatus
+        }
+    });
 });
 
 export const getRevenueChart = asyncHandler(async (req, res) => {
@@ -72,3 +107,4 @@ export const getRevenueChart = asyncHandler(async (req, res) => {
 
     return res.json({ success: true, data: chartData });
 });
+
