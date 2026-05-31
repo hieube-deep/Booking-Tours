@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Khôi phục session từ localStorage
   useEffect(() => {
     const savedToken = storage.getToken();
     const savedUser = storage.getUser<AuthContextType['user']>();

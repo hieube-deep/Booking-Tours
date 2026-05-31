@@ -8,7 +8,6 @@ export const ROUTES = {
   TOUR_DETAIL: '/tours/:slug',
   LOGIN: '/login',
   REGISTER: '/register',
-  
   // Protected
   PROFILE: '/profile',
   CHANGE_PASSWORD: '/profile/change-password',
