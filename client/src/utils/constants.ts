@@ -13,7 +13,7 @@ export const ROUTES = {
   CHANGE_PASSWORD: '/profile/change-password',
   BOOKING: '/booking/:tourId',
   MY_BOOKINGS: '/my-bookings',
-
+  WISHLIST: '/wishlist',
   // Admin
   ADMIN_DASHBOARD: '/admin',
   ADMIN_TOURS: '/admin/tours',
