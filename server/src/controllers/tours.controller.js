@@ -1,5 +1,6 @@
 import Tour from "../models/tours.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import mongoose from "mongoose";
 
 export const getAllTours = asyncHandler(async (req, res) => {
     const tours = await Tour.find({ isActive: true }).sort({ createdAt: -1 });
@@ -9,10 +10,19 @@ export const getAllTours = asyncHandler(async (req, res) => {
 
 export const getTourById = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const tour = await Tour.findById(id).populate({
-        path: "review",
-        select: "_id"
-    });
+    let tour;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        tour = await Tour.findById(id).populate({
+            path: "review",
+            select: "_id"
+        });
+    } else {
+        tour = await Tour.findOne({ slug: id }).populate({
+            path: "review",
+            select: "_id"
+        });
+    }
 
     if (!tour) {
         return res.status(404).json({

@@ -87,7 +87,7 @@ export default function TourListPage() {
                   </span>
 
                   <button className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
-                    <Link to={`/tours/${tour.slug}`}>Xem chi tiết </Link>
+                    <Link to={`/tours/${tour.slug}`}>Xem chi tiết</Link>
                   </button>
                 </div>
               </div>
