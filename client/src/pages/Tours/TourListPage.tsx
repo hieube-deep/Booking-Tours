@@ -1,4 +1,4 @@
-import { tourApi } from '@/api/tourApi';
+﻿import { tourApi } from '@/api/tourApi';
 import Loading from '@/components/ui/Loading';
 import type { Tour } from '@/types/tour';
 import { useEffect, useState } from 'react';
@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 
 export default function TourListPage() {
-  const [tours, setTours] = useState<Tour[] | null>(null);
+  const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     const fetchTours = async () => {
@@ -83,11 +83,11 @@ export default function TourListPage() {
 
                 <div className="flex justify-between items-center mt-auto">
                   <span className="text-blue-600 font-bold text-xl">
-                    {tour.price.adult.toLocaleString('vi-VN')} đ
+                    {tour.price.adult.toLocaleString('vi-VN')} Đ
                   </span>
 
                   <button className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
-                    <Link to={`/tours/${tour.slug}`}>xem chi tiết</Link>
+                    <Link to={`/tours/${tour.slug}`}>Xem chi tiết </Link>
                   </button>
                 </div>
               </div>
