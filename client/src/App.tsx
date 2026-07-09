@@ -67,8 +67,7 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/tours" element={<TourListPage />} />
-              <Route path='/tours/:slug' element={<TourDetailPage />}
-              />
+              <Route path='/tours/:slug' element={<TourDetailPage />} />
 
               {/* Protected Routes */}
               <Route

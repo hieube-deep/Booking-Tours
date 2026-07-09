@@ -12,16 +12,19 @@ export const getTourById = asyncHandler(async (req, res) => {
     const { id } = req.params;
     let tour;
 
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        tour = await Tour.findById(id).populate({
-            path: "review",
-            select: "_id"
-        });
+    // Thử tìm bằng slug trước (slug là chuỗi chứa dấu '-')
+    // nếu id trông giống ObjectId (24 ký tự hex) thì thử findById, không thì findOne theo slug
+    const isObjectId = /^[a-fA-F0-9]{24}$/.test(id);
+
+    if (isObjectId) {
+        tour = await Tour.findById(id).populate({ path: "review", select: "_id" });
+        // Nếu không tìm thấy theo _id, fallback sang slug
+        if (!tour) {
+            tour = await Tour.findOne({ slug: id }).populate({ path: "review", select: "_id" });
+        }
     } else {
-        tour = await Tour.findOne({ slug: id }).populate({
-            path: "review",
-            select: "_id"
-        });
+        // Tìm theo slug
+        tour = await Tour.findOne({ slug: id }).populate({ path: "review", select: "_id" });
     }
 
     if (!tour) {
