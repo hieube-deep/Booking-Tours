@@ -1,4 +1,4 @@
-﻿import axiosClient from './axiosClient';
+import axiosClient from './axiosClient';
 import type { ApiResponse, PaginatedResponse } from '@/types/api';
 import type { Tour, TourType } from '@/types/tour';
 import type { User } from '@/types/user';
@@ -46,6 +46,7 @@ export interface AdminTourPayload {
 export interface AdminBooking {
   _id: string;
   userId?: Pick<User, '_id' | 'name' | 'email' | 'phone'>;
+  tourId?: Pick<Tour, '_id' | 'title' | 'slug' | 'destination'>;
   departureId?: {
     _id: string;
     departureDate?: string;
@@ -119,3 +120,6 @@ export const adminApi = {
     return axiosClient.delete(`/admin/users/${id}`);
   },
 };
+
+
+

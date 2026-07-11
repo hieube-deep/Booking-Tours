@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose
 const bookingSchema = new Schema({
+    tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
     departureId: { type: Schema.Types.ObjectId, ref: 'Departure' },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['pending', 'success', 'failed', 'cancelled'], default: 'pending' },

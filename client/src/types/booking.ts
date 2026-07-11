@@ -1,10 +1,12 @@
-export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'success';
+import type { Tour } from './tour';
+
+export type BookingStatus = 'pending' | 'success' | 'failed' | 'cancelled';
 
 export interface PriceBreakdown {
-  adult: number;
-  child: number;
-  infant: number;
+  adultTotal: number;
+  childTotal: number;
   singleRoomSurcharge: number;
+  discount: number;
   total: number;
 }
 
@@ -16,10 +18,16 @@ export interface Passengers {
 
 export interface Booking {
   _id: string;
-  user: string;
-  tour: string;
-  departure: string;
-  passengers: Passengers;
+  userId: string;
+  tourId?: Pick<Tour, '_id' | 'title' | 'slug' | 'destination' | 'thumbnail' | 'price' | 'duration' | 'departureFrom'> | string;
+  departureId?: string;
+  passengers: Array<{
+    fullName: string;
+    type: 'adult' | 'child' | 'infant';
+  }>;
+  totalAdults: number;
+  totalChildren: number;
+  totalInfants: number;
   priceBreakdown: PriceBreakdown;
   contactInfo: {
     name: string;
@@ -34,7 +42,7 @@ export interface Booking {
 
 export interface CreateBookingRequest {
   tourId: string;
-  departureId: string;
+  departureId?: string;
   passengers: Passengers;
   contactInfo: {
     name: string;
@@ -42,4 +50,6 @@ export interface CreateBookingRequest {
     phone: string;
   };
   specialRequests?: string;
+  singleRoom?: boolean;
+  paymentMethod?: 'vnpay' | 'cash';
 }

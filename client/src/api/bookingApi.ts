@@ -2,8 +2,12 @@ import axiosClient from './axiosClient';
 import type { Booking, CreateBookingRequest } from '@/types/booking';
 import type { ApiResponse, PaginatedResponse } from '@/types/api';
 
+export interface CreateBookingResponse extends ApiResponse<Booking> {
+  paymentUrl?: string;
+}
+
 export const bookingApi = {
-  create: (data: CreateBookingRequest): Promise<ApiResponse<Booking>> => {
+  create: (data: CreateBookingRequest): Promise<CreateBookingResponse> => {
     return axiosClient.post('/bookings', data);
   },
 

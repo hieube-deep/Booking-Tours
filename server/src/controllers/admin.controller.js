@@ -1,4 +1,4 @@
-﻿import Booking from "../models/bookings.model.js";
+import Booking from "../models/bookings.model.js";
 import Payment from "../models/payments.model.js";
 import User from "../models/users.model.js";
 import Tour from "../models/tours.model.js";
@@ -153,6 +153,7 @@ export const getAdminBookings = asyncHandler(async (req, res) => {
     const [bookings, total] = await Promise.all([
         Booking.find(filters)
             .populate("userId", "name email phone")
+            .populate("tourId", "title slug destination")
             .populate({
                 path: "departureId",
                 select: "tourId departureDate returnDate status",
@@ -281,3 +282,5 @@ export const deleteUser = asyncHandler(async (req, res) => {
         data: user
     });
 });
+
+

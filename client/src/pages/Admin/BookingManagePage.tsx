@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { adminApi, type AdminBooking } from '@/api/adminApi';
 import Loading from '@/components/ui/Loading';
@@ -102,8 +102,8 @@ export default function BookingManagePage() {
                       <p className="text-sm text-slate-500">{booking.contactInfo?.phone || booking.userId?.phone}</p>
                     </td>
                     <td className="px-4 py-4 min-w-64">
-                      <p className="font-medium text-slate-900">{booking.departureId?.tourId?.title || 'Chưa có tour'}</p>
-                      <p className="text-sm text-slate-500">{booking.departureId?.tourId?.destination || 'Chưa có điểm đến'}</p>
+                      <p className="font-medium text-slate-900">{booking.departureId?.tourId?.title || booking.tourId?.title || 'Chưa có tour'}</p>
+                      <p className="text-sm text-slate-500">{booking.departureId?.tourId?.destination || booking.tourId?.destination || 'Chưa có điểm đến'}</p>
                     </td>
                     <td className="px-4 py-4 text-sm text-slate-600">
                       {booking.totalAdults} người lớn, {booking.totalChildren} trẻ em, {booking.totalInfants} em bé
@@ -136,3 +136,4 @@ export default function BookingManagePage() {
     </div>
   );
 }
+

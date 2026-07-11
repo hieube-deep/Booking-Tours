@@ -25,6 +25,7 @@ import TourManagePage from '@/pages/Admin/TourManagePage';
 import BookingManagePage from '@/pages/Admin/BookingManagePage';
 import UserManagePage from '@/pages/Admin/UserManagePage';
 import NotFoundPage from '@/pages/NotFound/NotFoundPage';
+import PaymentResultPage from '@/pages/Payment/PaymentResultPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,6 +69,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/tours" element={<TourListPage />} />
               <Route path='/tours/:slug' element={<TourDetailPage />} />
+              <Route path="/payment-result" element={<PaymentResultPage />} />
 
               {/* Protected Routes */}
               <Route
@@ -119,3 +121,4 @@ function App() {
 }
 
 export default App;
+
