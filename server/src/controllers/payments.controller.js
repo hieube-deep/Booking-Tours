@@ -9,16 +9,6 @@ const VNPAY_ORDER_TYPE = "other";
 const VNPAY_LOCALE = "vn";
 const VNPAY_CURRENCY = "VND";
 
-const sortObject = (obj) => {
-    const sorted = {};
-    Object.keys(obj)
-        .sort()
-        .forEach((key) => {
-            sorted[key] = obj[key];
-        });
-    return sorted;
-};
-
 const formatVnpayDate = (date) => {
     const pad = (number) => number.toString().padStart(2, "0");
     return [
@@ -32,8 +22,15 @@ const formatVnpayDate = (date) => {
 };
 
 const buildSignedQuery = (params, secret) => {
-    const sortedParams = sortObject(params);
-    const signData = new URLSearchParams(sortedParams).toString();
+    const sorted = {};
+    const keys = Object.keys(params).sort();
+    keys.forEach((key) => {
+        sorted[key] = encodeURIComponent(params[key]).replace(/%20/g, "+");
+    });
+    const signData = Object.entries(sorted)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("&");
+
     const secureHash = crypto
         .createHmac("sha512", secret)
         .update(signData, "utf-8")
@@ -54,7 +51,15 @@ const verifyVnpaySignature = (query) => {
     delete params.vnp_SecureHash;
     delete params.vnp_SecureHashType;
 
-    const signData = new URLSearchParams(sortObject(params)).toString();
+    const sorted = {};
+    const keys = Object.keys(params).sort();
+    keys.forEach((key) => {
+        sorted[key] = encodeURIComponent(params[key]).replace(/%20/g, "+");
+    });
+    const signData = Object.entries(sorted)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("&");
+
     const expectedHash = crypto
         .createHmac("sha512", secret)
         .update(signData, "utf-8")
@@ -65,11 +70,15 @@ const verifyVnpaySignature = (query) => {
 
 const getClientIp = (req) => {
     const forwardedFor = req.headers["x-forwarded-for"];
-    if (forwardedFor) {
-        return forwardedFor.split(",")[0].trim();
-    }
+    let ip = forwardedFor 
+        ? forwardedFor.split(",")[0].trim() 
+        : (req.socket?.remoteAddress || "127.0.0.1");
 
-    return req.socket?.remoteAddress?.replace("::ffff:", "") || "127.0.0.1";
+    ip = ip.replace("::ffff:", "");
+    if (ip === "::1" || ip === "localhost") {
+        ip = "127.0.0.1";
+    }
+    return ip;
 };
 
 export const createVnpayPaymentUrl = async (booking, req) => {
