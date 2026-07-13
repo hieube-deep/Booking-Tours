@@ -10,17 +10,24 @@ export interface PriceBreakdown {
   total: number;
 }
 
-export interface Passengers {
-  adults: number;
-  children: number;
-  infants: number;
+export interface PassengerInput {
+  fullName: string;
+  type: 'adult' | 'child' | 'infant';
 }
 
 export interface Booking {
   _id: string;
   userId: string;
   tourId?: Pick<Tour, '_id' | 'title' | 'slug' | 'destination' | 'thumbnail' | 'price' | 'duration' | 'departureFrom'> | string;
-  departureId?: string;
+  departureId?: {
+    _id: string;
+    departureDate?: string;
+    returnDate?: string;
+    status?: string;
+    maxSlots?: number;
+    bookedSlots?: number;
+    availableSlots?: number;
+  } | string;
   passengers: Array<{
     fullName: string;
     type: 'adult' | 'child' | 'infant';
@@ -35,6 +42,7 @@ export interface Booking {
     phone: string;
   };
   specialRequests?: string;
+  promoCode?: string;
   status: BookingStatus;
   createdAt: string;
   updatedAt: string;
@@ -43,7 +51,7 @@ export interface Booking {
 export interface CreateBookingRequest {
   tourId: string;
   departureId?: string;
-  passengers: Passengers;
+  passengers: PassengerInput[];
   contactInfo: {
     name: string;
     email: string;
@@ -52,4 +60,5 @@ export interface CreateBookingRequest {
   specialRequests?: string;
   singleRoom?: boolean;
   paymentMethod?: 'vnpay' | 'cash';
+  promoCode?: string;
 }

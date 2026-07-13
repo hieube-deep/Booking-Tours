@@ -2,6 +2,8 @@ import axiosClient from './axiosClient';
 import type { ApiResponse, PaginatedResponse } from '@/types/api';
 import type { Tour, TourType } from '@/types/tour';
 import type { User } from '@/types/user';
+import type { Departure, DepartureStatus } from '@/types/departure';
+import type { Promotion, PromotionType } from '@/types/promotion';
 
 export interface DashboardStats {
   totalUsers: number;
@@ -79,6 +81,32 @@ export interface AdminBooking {
   updatedAt: string;
 }
 
+export interface AdminDeparturePayload {
+  tourId: string;
+  departureDate: string;
+  returnDate: string;
+  status: DepartureStatus;
+  maxSlots: number;
+  bookedSlots?: number;
+  priceOverride?: {
+    adult?: number;
+    child?: number;
+  };
+}
+
+export interface AdminPromotionPayload {
+  code: string;
+  type: PromotionType;
+  value: number;
+  minOrderValue?: number;
+  maxDiscount?: number;
+  usageLimit?: number;
+  applicableTours?: string[];
+  startDate?: string;
+  endDate?: string;
+  isActive: boolean;
+}
+
 export const adminApi = {
   getDashboard: (): Promise<ApiResponse<DashboardStats>> => {
     return axiosClient.get('/admin/dashboard');
@@ -118,6 +146,38 @@ export const adminApi = {
 
   deleteUser: (id: string): Promise<ApiResponse<User>> => {
     return axiosClient.delete(`/admin/users/${id}`);
+  },
+
+  getDepartures: (params?: { page?: number; limit?: number; tourId?: string }): Promise<PaginatedResponse<Departure>> => {
+    return axiosClient.get('/admin/departures', { params });
+  },
+
+  createDeparture: (data: AdminDeparturePayload) => {
+    return axiosClient.post('/admin/departures', data);
+  },
+
+  updateDeparture: (id: string, data: AdminDeparturePayload) => {
+    return axiosClient.put(`/admin/departures/${id}`, data);
+  },
+
+  deleteDeparture: (id: string) => {
+    return axiosClient.delete(`/admin/departures/${id}`);
+  },
+
+  getPromotions: (params?: { page?: number; limit?: number }): Promise<PaginatedResponse<Promotion>> => {
+    return axiosClient.get('/admin/promotions', { params });
+  },
+
+  createPromotion: (data: AdminPromotionPayload) => {
+    return axiosClient.post('/admin/promotions', data);
+  },
+
+  updatePromotion: (id: string, data: AdminPromotionPayload) => {
+    return axiosClient.put(`/admin/promotions/${id}`, data);
+  },
+
+  deletePromotion: (id: string) => {
+    return axiosClient.delete(`/admin/promotions/${id}`);
   },
 };
 

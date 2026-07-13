@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Tour from './models/tours.model.js';
+import Departure from './models/departures.model.js';
+import Promotion from './models/promotions.model.js';
 
 dotenv.config();
 
@@ -293,15 +295,75 @@ const tours = [
   }
 ];
 
+const addDays = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  date.setHours(8, 0, 0, 0);
+  return date;
+};
+
+async function seedDepartures(insertedTours) {
+  const departures = insertedTours.flatMap((tour) => [
+    {
+      tourId: tour._id,
+      departureDate: addDays(14),
+      returnDate: addDays(14 + tour.duration.days - 1),
+      status: "open",
+      maxSlots: tour.maxGroupSize || 20,
+      bookedSlots: 0
+    },
+    {
+      tourId: tour._id,
+      departureDate: addDays(30),
+      returnDate: addDays(30 + tour.duration.days - 1),
+      status: "open",
+      maxSlots: tour.maxGroupSize || 20,
+      bookedSlots: 2
+    }
+  ]);
+
+  await Departure.insertMany(departures);
+}
+
+async function seedPromotions() {
+  await Promotion.insertMany([
+    {
+      code: "WELCOME10",
+      type: "percent",
+      value: 10,
+      maxDiscount: 500000,
+      minOrderValue: 0,
+      applicableTours: [],
+      isActive: true
+    },
+    {
+      code: "SUMMER300K",
+      type: "fixed",
+      value: 300000,
+      minOrderValue: 2000000,
+      applicableTours: [],
+      isActive: true
+    }
+  ]);
+}
+
 async function seedDB() {
   try {
     console.log("Đang kết nối CSDL...");
     await mongoose.connect(MONGO_URI);
-    console.log("Kết nối thành công! Đang xóa các tour cũ...");
-    await Tour.deleteMany({});
+    console.log("Kết nối thành công! Đang xóa dữ liệu cũ...");
+    await Promise.all([
+      Tour.deleteMany({}),
+      Departure.deleteMany({}),
+      Promotion.deleteMany({})
+    ]);
     console.log("Đang chèn dữ liệu tour mẫu mới...");
-    await Tour.insertMany(tours);
-    console.log("Khởi tạo dữ liệu tour thành công!");
+    const insertedTours = await Tour.insertMany(tours);
+    console.log("Đang chèn lịch khởi hành mẫu...");
+    await seedDepartures(insertedTours);
+    console.log("Đang chèn mã giảm giá mẫu...");
+    await seedPromotions();
+    console.log("Khởi tạo dữ liệu mẫu thành công!");
   } catch (error) {
     console.error("Lỗi khi seed dữ liệu:", error);
   } finally {

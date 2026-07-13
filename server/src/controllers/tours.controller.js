@@ -2,10 +2,53 @@ import Tour from "../models/tours.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
-export const getAllTours = asyncHandler(async (req, res) => {
-    const tours = await Tour.find({ isActive: true }).sort({ createdAt: -1 });
+const sortOptions = {
+    newest: { createdAt: -1 },
+    priceAsc: { "price.adult": 1 },
+    priceDesc: { "price.adult": -1 },
+    rating: { rating: -1 },
+};
 
-    return res.status(200).json({ success: true, data: tours.length, tours })
+export const getAllTours = asyncHandler(async (req, res) => {
+    const { type, destination, search, minPrice, maxPrice, duration, isFeatured, sort } = req.query;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);
+    const skip = (page - 1) * limit;
+
+    const filters = { isActive: true };
+
+    if (type) filters.type = type;
+    if (destination) filters.destination = { $regex: destination, $options: "i" };
+    if (isFeatured !== undefined) filters.isFeatured = isFeatured === "true";
+    if (duration) filters["duration.days"] = Number(duration);
+    if (minPrice || maxPrice) {
+        filters["price.adult"] = {};
+        if (minPrice) filters["price.adult"].$gte = Number(minPrice);
+        if (maxPrice) filters["price.adult"].$lte = Number(maxPrice);
+    }
+    if (search) {
+        filters.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { destination: { $regex: search, $options: "i" } },
+            { tags: { $regex: search, $options: "i" } },
+        ];
+    }
+
+    const [tours, total] = await Promise.all([
+        Tour.find(filters).sort(sortOptions[sort] || sortOptions.newest).skip(skip).limit(limit),
+        Tour.countDocuments(filters),
+    ]);
+
+    return res.status(200).json({
+        success: true,
+        data: tours,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+        },
+    });
 });
 
 export const getTourById = asyncHandler(async (req, res) => {

@@ -76,6 +76,12 @@ export default function Header() {
                   </Link>
                 )}
                 <Link
+                  to={ROUTES.MY_BOOKINGS}
+                  className="px-3 py-1.5 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                >
+                  Đơn đặt tour
+                </Link>
+                <Link
                   to={ROUTES.PROFILE}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors"
                 >
@@ -134,6 +140,13 @@ export default function Header() {
               <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2 px-4">
                 {isAuthenticated ? (
                   <>
+                    <Link
+                      to={ROUTES.MY_BOOKINGS}
+                      className="py-2 text-slate-600 font-medium"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Đơn đặt tour
+                    </Link>
                     <Link
                       to={ROUTES.PROFILE}
                       className="py-2 text-slate-600 font-medium"

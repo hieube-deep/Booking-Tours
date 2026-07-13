@@ -99,12 +99,12 @@ export const googleLogin = async (req, res) => {
         let user = await User.findOne({ email });
 
         if (!user) {
-            const newUser = await User.create({
+            user = await User.create({
                 name,
                 email,
                 avatar: picture,
                 googleId: sub
-            })
+            });
         }
 
         return res.status(200).json({

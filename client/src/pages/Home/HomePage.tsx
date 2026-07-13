@@ -2,6 +2,37 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '@/utils/constants';
 import Button from '@/components/ui/Button';
 
+const categories = [
+  {
+    label: 'Trong nước',
+    type: 'domestic',
+    icon: '🇻🇳',
+    desc: 'Hạ Long, Sapa, Đà Nẵng, Phú Quốc...',
+    color: 'from-blue-500 to-cyan-400',
+  },
+  {
+    label: 'Quốc tế',
+    type: 'international',
+    icon: '✈️',
+    desc: 'Nhật Bản, Hàn Quốc, Thái Lan, Châu Âu...',
+    color: 'from-purple-500 to-pink-400',
+  },
+  {
+    label: 'Phiêu lưu',
+    type: 'adventure',
+    icon: '🏔️',
+    desc: 'Trekking, leo núi, khám phá thiên nhiên',
+    color: 'from-emerald-500 to-teal-400',
+  },
+  {
+    label: 'Văn hóa',
+    type: 'cultural',
+    icon: '🏯',
+    desc: 'Di sản, lễ hội, ẩm thực bản địa',
+    color: 'from-orange-500 to-amber-400',
+  },
+];
+
 export default function HomePage() {
   return (
     <div>
@@ -34,6 +65,44 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Danh mục tour
+            </h2>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+              Chọn loại hình du lịch phù hợp với sở thích của bạn
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categories.map((category) => (
+              <Link
+                key={category.type}
+                to={`${ROUTES.TOURS}?type=${category.type}`}
+                className="group relative overflow-hidden rounded-2xl bg-white border border-slate-100 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center text-2xl mb-5 shadow-lg`}>
+                  {category.icon}
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  {category.label}
+                </h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{category.desc}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Khám phá ngay
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
