@@ -18,12 +18,16 @@ import RegisterPage from '@/pages/Auth/RegisterPage';
 import TourListPage from '@/pages/Tours/TourListPage';
 import TourDetailPage from '@/pages/Tours/TourDetailPage';
 import BookingPage from '@/pages/Booking/BookingPage';
+import MyBookingsPage from '@/pages/Booking/MyBookingsPage';
+import BookingDetailPage from '@/pages/Booking/BookingDetailPage';
 import ProfilePage from '@/pages/Profile/ProfilePage';
 import ChangePasswordPage from '@/pages/Profile/ChangePasswordPage';
 import DashboardPage from '@/pages/Admin/DashboardPage';
 import TourManagePage from '@/pages/Admin/TourManagePage';
 import BookingManagePage from '@/pages/Admin/BookingManagePage';
 import UserManagePage from '@/pages/Admin/UserManagePage';
+import DepartureManagePage from '@/pages/Admin/DepartureManagePage';
+import PromotionManagePage from '@/pages/Admin/PromotionManagePage';
 import NotFoundPage from '@/pages/NotFound/NotFoundPage';
 import PaymentResultPage from '@/pages/Payment/PaymentResultPage';
 
@@ -62,6 +66,8 @@ function App() {
               <Route path="tours" element={<TourManagePage />} />
               <Route path="bookings" element={<BookingManagePage />} />
               <Route path="users" element={<UserManagePage />} />
+              <Route path="departures" element={<DepartureManagePage />} />
+              <Route path="promotions" element={<PromotionManagePage />} />
             </Route>
 
             {/* Main Layout */}
@@ -77,6 +83,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <BookingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-bookings"
+                element={
+                  <ProtectedRoute>
+                    <MyBookingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-bookings/:id"
+                element={
+                  <ProtectedRoute>
+                    <BookingDetailPage />
                   </ProtectedRoute>
                 }
               />

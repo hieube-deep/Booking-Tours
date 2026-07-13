@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTourDetail } from '@/hooks/useTours';
+import { useDeparturesByTour } from '@/hooks/useDepartures';
 import { reviewApi } from '@/api/reviewApi';
 import { useAuth } from '@/hooks/useAuth';
 import Loading from '@/components/ui/Loading';
 import Button from '@/components/ui/Button';
 import { toast } from 'react-toastify';
 import { TOUR_TYPE_LABELS } from '@/utils/constants';
+import { formatDate } from '@/utils/formatters';
+import type { Departure } from '@/types/departure';
 
 export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -22,6 +25,7 @@ export default function TourDetailPage() {
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [singleRoom, setSingleRoom] = useState(false);
+  const [selectedDepartureId, setSelectedDepartureId] = useState<string | null>(null);
 
 
   const [rating, setRating] = useState(5);
@@ -31,6 +35,9 @@ export default function TourDetailPage() {
 
   const { data: tourResponse, isLoading, isError } = useTourDetail(slug || '');
   const tour = (tourResponse as any)?.tour || tourResponse?.data;
+
+  const { data: departuresResponse } = useDeparturesByTour(tour?._id);
+  const departures = departuresResponse?.data || [];
 
 
   const { data: reviewsResponse, isLoading: isReviewsLoading } = useQuery({
@@ -111,7 +118,12 @@ export default function TourDetailPage() {
   };
 
   const handleBooking = () => {
-    navigate(`/booking/${tour._id}?adults=${adults}&children=${children}&infants=${infants}&singleRoom=${singleRoom ? 1 : 0}`);
+    if (departures.length > 0 && !selectedDepartureId) {
+      toast.warning('Vui lòng chọn ngày khởi hành trước khi đặt tour.');
+      return;
+    }
+    const departureParam = selectedDepartureId ? `&departureId=${selectedDepartureId}` : '';
+    navigate(`/booking/${tour._id}?adults=${adults}&children=${children}&infants=${infants}&singleRoom=${singleRoom ? 1 : 0}${departureParam}`);
   };
 
   const handleSubmitReview = (e: React.FormEvent) => {
@@ -585,6 +597,40 @@ export default function TourDetailPage() {
 
               <div className="p-6 space-y-5">
 
+                {departures.length > 0 && (
+                  <div className="space-y-3 border-b border-slate-100 pb-5">
+                    <p className="text-sm font-bold text-slate-800">Chọn ngày khởi hành</p>
+                    <div className="space-y-2">
+                      {departures.map((departure: Departure) => {
+                        const isSelected = selectedDepartureId === departure._id;
+                        const isFull = departure.availableSlots <= 0;
+                        return (
+                          <button
+                            key={departure._id}
+                            type="button"
+                            disabled={isFull}
+                            onClick={() => setSelectedDepartureId(departure._id)}
+                            className={`w-full text-left rounded-lg border px-4 py-2.5 transition-colors ${isSelected
+                              ? 'border-blue-500 bg-blue-50'
+                              : isFull
+                                ? 'border-slate-100 bg-slate-50 opacity-60 cursor-not-allowed'
+                                : 'border-slate-200 hover:border-blue-300'
+                              }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-semibold text-slate-800">
+                                {formatDate(departure.departureDate)} - {formatDate(departure.returnDate)}
+                              </span>
+                              <span className={`text-xs font-semibold ${isFull ? 'text-red-500' : 'text-emerald-600'}`}>
+                                {isFull ? 'Hết chỗ' : `Còn ${departure.availableSlots} chỗ`}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-4 border-b border-slate-100 pb-5">
 

@@ -4,8 +4,7 @@ import Tour from "../models/tours.model.js";
 import Payment from "../models/payments.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { createVnpayPaymentUrl } from "./payments.controller.js";
-
-const parseCount = (value, fallback = 0) => Math.max(Number(value) || fallback, 0);
+import { computeDiscount, findValidPromotion } from "./promotion.controller.js";
 
 const getPagination = (req) => {
     const page = Math.max(Number(req.query.page) || 1, 1);
@@ -30,7 +29,7 @@ export const createBooking = asyncHandler(async (req, res) => {
     const {
         tourId,
         departureId,
-        passengers = {},
+        passengers = [],
         contactInfo,
         specialRequests,
         promoCode,
@@ -45,10 +44,21 @@ export const createBooking = asyncHandler(async (req, res) => {
         });
     }
 
-    const totalAdults = Math.max(parseCount(passengers.adults, 1), 1);
-    const totalChildren = parseCount(passengers.children);
-    const totalInfants = parseCount(passengers.infants);
+    if (!Array.isArray(passengers) || passengers.length === 0 || passengers.some((p) => !p.fullName?.trim())) {
+        return res.status(400).json({
+            success: false,
+            message: "Vui long nhap ho ten day du cho tat ca hanh khach"
+        });
+    }
+
+    const totalAdults = passengers.filter((p) => p.type === "adult").length;
+    const totalChildren = passengers.filter((p) => p.type === "child").length;
+    const totalInfants = passengers.filter((p) => p.type === "infant").length;
     const totalGuests = totalAdults + totalChildren + totalInfants;
+
+    if (totalAdults < 1) {
+        return res.status(400).json({ success: false, message: "Booking phai co it nhat 1 hanh khach nguoi lon" });
+    }
 
     const tour = await Tour.findOne({ _id: tourId, isActive: true });
     if (!tour) {
@@ -76,15 +86,27 @@ export const createBooking = asyncHandler(async (req, res) => {
     const childTotal = totalChildren * price.child;
     const infantTotal = totalInfants * price.infant;
     const singleRoomSurcharge = singleRoom ? totalAdults * price.singleRoomSurcharge : 0;
-    const discount = 0;
-    const total = adultTotal + childTotal + infantTotal + singleRoomSurcharge - discount;
+    const subtotal = adultTotal + childTotal + infantTotal + singleRoomSurcharge;
+
+    let discount = 0;
+    let appliedPromotion = null;
+    if (promoCode) {
+        const { promotion, error } = await findValidPromotion({ code: promoCode, tourId: tour._id, subtotal });
+        if (error) {
+            return res.status(400).json({ success: false, message: error });
+        }
+        discount = computeDiscount(promotion, subtotal);
+        appliedPromotion = promotion;
+    }
+
+    const total = subtotal - discount;
 
     const booking = await Booking.create({
         tourId: tour._id,
         departureId: departure?._id,
         userId: req.user._id,
         status: "pending",
-        passengers: [],
+        passengers,
         contactInfo,
         specialRequests,
         totalAdults,
@@ -97,8 +119,13 @@ export const createBooking = asyncHandler(async (req, res) => {
             discount,
             total
         },
-        promoCode
+        promoCode: appliedPromotion?.code
     });
+
+    if (appliedPromotion) {
+        appliedPromotion.usedCount = (appliedPromotion.usedCount || 0) + 1;
+        await appliedPromotion.save();
+    }
 
     if (departure) {
         departure.bookedSlots = (departure.bookedSlots || 0) + totalGuests;

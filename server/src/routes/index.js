@@ -5,6 +5,8 @@ import AdminRouter from "./admin.route.js";
 import ReviewRouter from "./reviews.route.js";
 import BookingRouter from "./bookings.route.js";
 import PaymentRouter from "./payments.route.js";
+import DepartureRouter from "./departures.route.js";
+import PromotionRouter from "./promotions.route.js";
 
 const router = express.Router();
 
@@ -14,5 +16,7 @@ router.use('/admin', AdminRouter);
 router.use('/reviews', ReviewRouter);
 router.use('/bookings', BookingRouter);
 router.use('/payments', PaymentRouter);
+router.use('/departures', DepartureRouter);
+router.use('/promotions', PromotionRouter);
 
 export default router;

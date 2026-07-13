@@ -19,6 +19,8 @@ export const ROUTES = {
   ADMIN_TOURS: '/admin/tours',
   ADMIN_BOOKINGS: '/admin/bookings',
   ADMIN_USERS: '/admin/users',
+  ADMIN_DEPARTURES: '/admin/departures',
+  ADMIN_PROMOTIONS: '/admin/promotions',
 } as const;
 
 // Pagination
@@ -35,14 +37,14 @@ export const TOUR_TYPE_LABELS: Record<string, string> = {
 // Booking status
 export const BOOKING_STATUS_LABELS: Record<string, string> = {
   pending: 'Chờ xác nhận',
-  confirmed: 'Đã xác nhận',
-  cancelled: 'Đã hủy',
   success: 'Thành công',
+  failed: 'Thất bại',
+  cancelled: 'Đã hủy',
 };
 
 export const BOOKING_STATUS_COLORS: Record<string, string> = {
   pending: 'text-yellow-600 bg-yellow-50',
-  confirmed: 'text-blue-600 bg-blue-50',
-  cancelled: 'text-red-600 bg-red-50',
   success: 'text-green-600 bg-green-50',
+  failed: 'text-red-600 bg-red-50',
+  cancelled: 'text-slate-600 bg-slate-100',
 };
